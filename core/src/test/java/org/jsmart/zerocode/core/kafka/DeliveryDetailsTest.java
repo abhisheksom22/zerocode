@@ -1,6 +1,7 @@
 package org.jsmart.zerocode.core.kafka;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
+
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.jsmart.zerocode.core.di.provider.GsonSerDeProvider;
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.skyscreamer.jsonassert.JSONCompareMode.LENIENT;
 
 public class DeliveryDetailsTest {
@@ -25,10 +27,13 @@ public class DeliveryDetailsTest {
     public void testSerDeser() throws IOException {
         DeliveryDetails deliveryDetails = new DeliveryDetails("Ok", "test message", 10, null);
 
-        String json = gson.toJson(deliveryDetails);
-        assertThat(json, is("{\"status\":\"Ok\",\"message\":\"test message\",\"size\":10}"));
+        String actualJson = gson.toJson(deliveryDetails);
+        String expectedJson = "{\"status\":\"Ok\",\"message\":\"test message\",\"size\":10}";
+        JsonObject actualJsonObject = JsonParser.parseString(actualJson).getAsJsonObject();
+        JsonObject expectedJsonObject = JsonParser.parseString(expectedJson).getAsJsonObject();
+        assertEquals(expectedJsonObject, actualJsonObject);
 
-        DeliveryDetails javaPojo = gson.fromJson(json, DeliveryDetails.class);
+        DeliveryDetails javaPojo = gson.fromJson(actualJson, DeliveryDetails.class);
         assertThat(javaPojo, is(deliveryDetails));
     }
 
